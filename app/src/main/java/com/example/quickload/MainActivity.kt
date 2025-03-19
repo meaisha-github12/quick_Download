@@ -4,7 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-
+import android.util.Patterns
 import android.webkit.URLUtil.isValidUrl
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,8 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
-
-import android.util.Patterns
 
 class MainActivity : ComponentActivity() {
     private val STORAGE_PERMISSION_CODE = 100
@@ -70,7 +68,7 @@ fun DownloaderApp() {
     ) {
         Text("QuickLoad", fontSize = 28.sp, modifier = Modifier.padding(bottom = 16.dp))
 
-        // URL Input Field
+        // **URL Input Field**
         BasicTextField(
             value = url,
             onValueChange = {
@@ -84,7 +82,7 @@ fun DownloaderApp() {
                 .padding(12.dp)
         )
 
-        // Show error message if exists
+        // **Show error message if exists**
         errorMessage?.let {
             Text(
                 text = it,
@@ -96,27 +94,43 @@ fun DownloaderApp() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Download Button
+        // **Download Button with Loading Indicator**
         Button(
             onClick = {
                 val urlText = url.text.trim()
-                if (!isValidUrl(urlText)) {
-                    errorMessage = "Invalid URL! Please check spelling."
-                } else {
-                    coroutineScope.launch {
-                        isDownloading = true
-                        downloadFile(context, urlText) { error ->
-                            errorMessage = error
-                        }
-                        isDownloading = false
+
+                coroutineScope.launch {
+                    if (!isValidUrl(urlText)) {
+                        errorMessage = "❌ Invalid URL! Please check spelling."
+                        return@launch
                     }
+
+                    isDownloading = true  // Show loading indicator
+
+                    downloadFile(
+                        context,
+                        urlText,
+                        onError = { error ->
+                            errorMessage = error
+                            isDownloading = false  // Hide loading indicator
+                        },
+                        onSuccess = {
+                            errorMessage = "✅ File downloaded successfully!"
+                            url = TextFieldValue()  // Clear input field (Refresh UI)
+                            isDownloading = false  // Hide loading indicator
+                        }
+                    )
                 }
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isDownloading
+            enabled = !isDownloading  // Disable button while downloading
         ) {
             if (isDownloading) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                    color = Color.White
+                )
             } else {
                 Text("Download File")
             }
@@ -124,7 +138,7 @@ fun DownloaderApp() {
     }
 }
 
-
 fun isValidUrl(url: String): Boolean {
     return Patterns.WEB_URL.matcher(url).matches()
 }
+
