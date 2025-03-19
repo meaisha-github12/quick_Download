@@ -9,22 +9,27 @@ import android.webkit.URLUtil.isValidUrl
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.font.FontFamily
 
 class MainActivity : ComponentActivity() {
     private val STORAGE_PERMISSION_CODE = 100
@@ -54,19 +59,35 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DownloaderApp() {
+    val fontSemi = FontFamily(Font(R.font.inter_semi_bold))
+    val fontLight = FontFamily(Font(R.font.inter_extra_light))
     var url by remember { mutableStateOf(TextFieldValue()) }
     var isDownloading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
+            .background(Color(0xFF62686F)), // SAME BACKGROUND
+        contentAlignment = Alignment.Center
+
     ) {
-        Text("QuickLoad", fontSize = 28.sp, modifier = Modifier.padding(bottom = 16.dp))
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            // **App Title**
+            Text(
+                text = "QuickLoad",
+                fontSize = 32.sp,
+                fontFamily = fontSemi,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 20.dp)
+            )
 
         // **URL Input Field**
         BasicTextField(
@@ -78,7 +99,7 @@ fun DownloaderApp() {
             textStyle = TextStyle(fontSize = 16.sp),
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
+                .background(Color.White, shape = RoundedCornerShape(12.dp))
                 .padding(12.dp)
         )
 
@@ -88,6 +109,7 @@ fun DownloaderApp() {
                 text = it,
                 color = Color.Red,
                 fontSize = 14.sp,
+                fontFamily = fontLight,
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
@@ -95,8 +117,22 @@ fun DownloaderApp() {
         Spacer(modifier = Modifier.height(16.dp))
 
         // **Download Button with Loading Indicator**
-        Button(
-            onClick = {
+        Box(
+            modifier = Modifier
+                .width(200.dp)  // Set a specific width
+                .height(50.dp)  // Fixed height
+
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(Color(0xFF41444B), Color(0xFFCABFAB),
+                        Color.White, Color(0xFF41444B)
+                            )
+                    )
+                    ,
+
+                    shape = RoundedCornerShape(50) // Rounded Button
+                )
+            .clickable(enabled = !isDownloading){
                 val urlText = url.text.trim()
 
                 coroutineScope.launch {
@@ -122,8 +158,7 @@ fun DownloaderApp() {
                     )
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !isDownloading  // Disable button while downloading
+            contentAlignment = Alignment.Center
         ) {
             if (isDownloading) {
                 CircularProgressIndicator(
@@ -132,9 +167,15 @@ fun DownloaderApp() {
                     color = Color.White
                 )
             } else {
-                Text("Download File")
+                Text(
+                    text = "Download File",
+                    fontSize = 18.sp, // Adjust text size
+                    fontFamily = FontFamily(Font(R.font.inter_semi_bold)), // Apply custom font
+                    color = Color.Black,
+                    )
             }
         }
+    }
     }
 }
 
