@@ -4,35 +4,31 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+
+import android.webkit.URLUtil.isValidUrl
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+import android.util.Patterns
 
+class MainActivity : ComponentActivity() {
     private val STORAGE_PERMISSION_CODE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,63 +54,77 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloaderApp() {
     var url by remember { mutableStateOf(TextFieldValue()) }
     var isDownloading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text("File Downloader") })
-    }) { paddingValues ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("QuickLoad", fontSize = 28.sp, modifier = Modifier.padding(bottom = 16.dp))
+
+        // URL Input Field
+        BasicTextField(
+            value = url,
+            onValueChange = {
+                url = it
+                errorMessage = null  // Reset error message when typing
+            },
+            textStyle = TextStyle(fontSize = 16.sp),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            OutlinedTextField(
-                value = url,
-                onValueChange = { url = it },
-                label = { Text("Enter File URL") },
-                modifier = Modifier.fillMaxWidth()
+                .fillMaxWidth()
+                .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
+                .padding(12.dp)
+        )
+
+        // Show error message if exists
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 14.sp,
+                modifier = Modifier.padding(top = 8.dp)
             )
+        }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Button(
-                onClick = {
-                    if (url.text.isNotBlank()) {
-                        coroutineScope.launch {
-                            isDownloading = true
-                            downloadFile(context, url.text)
-                            isDownloading = false
-                        }
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isDownloading
-            ) {
-                if (isDownloading) {
-                    CircularProgressIndicator(modifier = Modifier.height(24.dp))
+        // Download Button
+        Button(
+            onClick = {
+                val urlText = url.text.trim()
+                if (!isValidUrl(urlText)) {
+                    errorMessage = "Invalid URL! Please check spelling."
                 } else {
-                    Text("Download File")
+                    coroutineScope.launch {
+                        isDownloading = true
+                        downloadFile(context, urlText) { error ->
+                            errorMessage = error
+                        }
+                        isDownloading = false
+                    }
                 }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isDownloading
+        ) {
+            if (isDownloading) {
+                CircularProgressIndicator(color = Color.White)
+            } else {
+                Text("Download File")
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Testing Links:", style = MaterialTheme.typography.bodyMedium)
-            Text("Image: https://via.placeholder.com/300.png")
-            Text("PDF: https://file-examples-com.github.io/uploads/2017/10/file-sample_150kB.pdf")
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewDownloaderApp() {
-    DownloaderApp()
+
+fun isValidUrl(url: String): Boolean {
+    return Patterns.WEB_URL.matcher(url).matches()
 }
