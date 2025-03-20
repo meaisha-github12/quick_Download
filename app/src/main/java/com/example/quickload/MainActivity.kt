@@ -8,6 +8,7 @@ import android.util.Patterns
 import android.webkit.URLUtil.isValidUrl
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,9 +18,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.input.TextFieldValue
@@ -71,14 +74,16 @@ fun DownloaderApp() {
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF62686F)), // SAME BACKGROUND
-        contentAlignment = Alignment.Center
 
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
         ) {
+            Image(painter = painterResource(R.drawable.icon), contentDescription =" App Icon" )
+
             // **App Title**
             Text(
                 text = "QuickLoad",
@@ -97,10 +102,13 @@ fun DownloaderApp() {
                 errorMessage = null  // Reset error message when typing
             },
             textStyle = TextStyle(fontSize = 16.sp),
+
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, shape = RoundedCornerShape(12.dp))
                 .padding(12.dp)
+                .height(56.dp) // Increased height for better visibility
+                .shadow(6.dp, shape = RoundedCornerShape(12.dp)) // Added elevation
         )
 
         // **Show error message if exists**
@@ -124,40 +132,40 @@ fun DownloaderApp() {
 
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF41444B), Color(0xFF8D8475),
-                         Color(0xFF41444B)
-                            )
-                    )
-                    ,
+                        colors = listOf(
+                            Color(0xFF41444B), Color(0xFF777269),
+                            Color(0xFF41444B)
+                        )
+                    ),
 
                     shape = RoundedCornerShape(50) // Rounded Button
                 )
-            .clickable(enabled = !isDownloading){
-                val urlText = url.text.trim()
+                .clickable(enabled = !isDownloading) {
+                    val urlText = url.text.trim()
 
-                coroutineScope.launch {
-                    if (!isValidUrl(urlText)) {
-                        errorMessage = "❌ Invalid URL! Please check spelling."
-                        return@launch
-                    }
-
-                    isDownloading = true  // Show loading indicator
-
-                    downloadFile(
-                        context,
-                        urlText,
-                        onError = { error ->
-                            errorMessage = error
-                            isDownloading = false  // Hide loading indicator
-                        },
-                        onSuccess = {
-                            errorMessage = "✅ File downloaded successfully!"
-                            url = TextFieldValue()  // Clear input field (Refresh UI)
-                            isDownloading = false  // Hide loading indicator
+                    coroutineScope.launch {
+                        if (!isValidUrl(urlText)) {
+                            errorMessage = "❌ Invalid URL! Please check spelling."
+                            return@launch
                         }
-                    )
-                }
-            },
+
+                        isDownloading = true  // Show loading indicator
+
+                        downloadFile(
+                            context,
+                            urlText,
+                            onError = { error ->
+                                errorMessage = error
+                                isDownloading = false  // Hide loading indicator
+                            },
+                            onSuccess = {
+                                errorMessage = "✅ File downloaded successfully!"
+                                url = TextFieldValue()  // Clear input field (Refresh UI)
+                                isDownloading = false  // Hide loading indicator
+                            }
+                        )
+                    }
+                },
             contentAlignment = Alignment.Center
         ) {
             if (isDownloading) {
