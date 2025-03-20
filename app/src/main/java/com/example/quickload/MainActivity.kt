@@ -117,7 +117,7 @@ fun DownloaderApp() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, shape = RoundedCornerShape(12.dp))
-                .height(56.dp)
+                .height(66.dp)
         )
 
         // **Show error message if exists**
