@@ -106,16 +106,16 @@ fun DownloaderApp() {
 
             textStyle = TextStyle(fontSize = 16.sp),
            colors = TextFieldDefaults.textFieldColors(
-               containerColor = Color.Transparent, // Removes default pinkish background
-               focusedIndicatorColor = Color.Transparent, // Removes underline when focused
-               unfocusedIndicatorColor = Color.Transparent, // Removes underline when not focused
+               containerColor = Color.Transparent,
+               focusedIndicatorColor = Color.Transparent,
+               unfocusedIndicatorColor = Color.Transparent,
                disabledIndicatorColor = Color.Transparent
            ),
 
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, shape = RoundedCornerShape(12.dp))
-                .height(56.dp) // Increased height for better visibility
+                .height(56.dp)
         )
 
         // **Show error message if exists**
@@ -134,8 +134,8 @@ fun DownloaderApp() {
         // **Download Button with Loading Indicator**
         Box(
             modifier = Modifier
-                .width(200.dp)  // Set a specific width
-                .height(50.dp)  // Fixed height
+                .width(200.dp)
+                .height(50.dp)
 
                 .background(
                     brush = Brush.horizontalGradient(
@@ -145,7 +145,7 @@ fun DownloaderApp() {
                         )
                     ),
 
-                    shape = RoundedCornerShape(50) // Rounded Button
+                    shape = RoundedCornerShape(50)
                 )
 
                 .clickable(enabled = !isDownloading) {
@@ -157,7 +157,7 @@ fun DownloaderApp() {
                             return@launch
                         }
 
-                        isDownloading = true  // Show loading indicator
+                        isDownloading = true
 
                         downloadFile(
                             context,
@@ -166,10 +166,11 @@ fun DownloaderApp() {
                                 errorMessage = error
                                 isDownloading = false  // Hide loading indicator
                             },
+                            // refresh Screen
                             onSuccess = {
                                 errorMessage = "✅ File downloaded successfully!"
-                                url = TextFieldValue()  // Clear input field (Refresh UI)
-                                isDownloading = false  // Hide loading indicator
+                                url = TextFieldValue()
+                                isDownloading = false
                             }
                         )
                     }

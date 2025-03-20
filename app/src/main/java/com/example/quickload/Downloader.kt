@@ -38,14 +38,14 @@ fun downloadFile(
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val downloadId = downloadManager.enqueue(request)
 
-        // Check if download is successful
+        // Checks if download is successful
         Handler(Looper.getMainLooper()).postDelayed({
             val query = DownloadManager.Query().setFilterById(downloadId)
             val cursor = downloadManager.query(query)
             if (cursor.moveToFirst()) {
                 val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    onSuccess()  // Notify UI
+                    onSuccess()
                 } else {
                     onError("⚠️ Download failed! Please try again.")
                 }
