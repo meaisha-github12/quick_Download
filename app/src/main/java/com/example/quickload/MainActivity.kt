@@ -122,7 +122,7 @@ fun DownloaderApp() {
         errorMessage?.let {
             Text(
                 text = it,
-                color = Color.White,
+                color = Color(0xFFFF8989),
                 fontSize = 14.sp,
                 fontFamily = fontLight,
                 modifier = Modifier.padding(top = 8.dp)
