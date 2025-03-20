@@ -60,6 +60,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloaderApp() {
     val fontSemi = FontFamily(Font(R.font.inter_semi_bold))
@@ -95,27 +96,33 @@ fun DownloaderApp() {
             )
 
         // **URL Input Field**
-        BasicTextField(
+       TextField(
             value = url,
             onValueChange = {
                 url = it
                 errorMessage = null  // Reset error message when typing
             },
+           placeholder = { Text(text = "Enter URL", color = Color.Gray, fontSize = 16.sp) },
+
             textStyle = TextStyle(fontSize = 16.sp),
+           colors = TextFieldDefaults.textFieldColors(
+               containerColor = Color.Transparent, // Removes default pinkish background
+               focusedIndicatorColor = Color.Transparent, // Removes underline when focused
+               unfocusedIndicatorColor = Color.Transparent, // Removes underline when not focused
+               disabledIndicatorColor = Color.Transparent
+           ),
 
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, shape = RoundedCornerShape(12.dp))
-                .padding(12.dp)
                 .height(56.dp) // Increased height for better visibility
-                .shadow(6.dp, shape = RoundedCornerShape(12.dp)) // Added elevation
         )
 
         // **Show error message if exists**
         errorMessage?.let {
             Text(
                 text = it,
-                color = Color.Red,
+                color = Color.White,
                 fontSize = 14.sp,
                 fontFamily = fontLight,
                 modifier = Modifier.padding(top = 8.dp)
@@ -140,6 +147,7 @@ fun DownloaderApp() {
 
                     shape = RoundedCornerShape(50) // Rounded Button
                 )
+
                 .clickable(enabled = !isDownloading) {
                     val urlText = url.text.trim()
 
