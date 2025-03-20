@@ -124,8 +124,8 @@ fun DownloaderApp() {
 
                 .background(
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF41444B), Color(0xFFCABFAB),
-                        Color.White, Color(0xFF41444B)
+                        colors = listOf(Color(0xFF41444B), Color(0xFF8D8475),
+                         Color(0xFF41444B)
                             )
                     )
                     ,
@@ -171,7 +171,8 @@ fun DownloaderApp() {
                     text = "Download File",
                     fontSize = 18.sp, // Adjust text size
                     fontFamily = FontFamily(Font(R.font.inter_semi_bold)), // Apply custom font
-                    color = Color.Black,
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 12.dp)
                     )
             }
         }
