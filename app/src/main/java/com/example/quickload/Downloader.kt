@@ -46,6 +46,11 @@ fun downloadFile(
                 val status = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     onSuccess()
+                    // Call scanFile to refresh gallery and file manager
+                    val filePath =
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            .toString() + "/" + fileName
+                    scanFile(context, filePath)
                 } else {
                     onError("⚠️ Download failed! Please try again.")
                 }
@@ -59,5 +64,8 @@ fun downloadFile(
         onError("❌ Error: ${e.message ?: "Unknown error occurred"}")
     }
 }
-
+fun scanFile(context: Context, filePath: String) {
+    MediaScannerConnection.scanFile(context, arrayOf(filePath), null) { _, uri ->
+        Toast.makeText(context, "File saved: $uri", Toast.LENGTH_SHORT).show()
+    }}
 
