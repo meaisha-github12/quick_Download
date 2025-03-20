@@ -83,7 +83,9 @@ fun DownloaderApp() {
                 .fillMaxWidth()
                 .padding(24.dp)
         ) {
-            Image(painter = painterResource(R.drawable.icon), contentDescription =" App Icon" )
+            Image(painter = painterResource(R.drawable.icon), contentDescription =" App Icon",
+                Modifier.size(280.dp)
+            )
 
             // **App Title**
             Text(
@@ -129,7 +131,7 @@ fun DownloaderApp() {
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
         // **Download Button with Loading Indicator**
         Box(
