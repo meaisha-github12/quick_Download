@@ -120,7 +120,7 @@ fun DownloaderApp() {
 
         )
             Text(
-                text = "💡 Tip: Enter multiple URLs on separate lines.",
+                text = "💡 Enter multiple URLs on separate lines.",
                 color = Color.LightGray,
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(R.font.inter_extra_light)),
