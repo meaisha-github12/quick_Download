@@ -151,32 +151,32 @@ fun DownloaderApp() {
                 )
 
                 .clickable(enabled = !isDownloading) {
-                    val urlText = url.text.trim()
+                    val urls = url.text.split("\n", ",").map { it.trim() }.filter { it.isNotEmpty() }
 
-                    coroutineScope.launch {
-                        if (!isValidUrl(urlText)) {
-                            errorMessage = "❌ Invalid URL! Please check spelling."
-                            return@launch
-                        }
-
-                        isDownloading = true
-
-                        downloadFile(
-                            context,
-                            urlText,
-                            onError = { error ->
-                                errorMessage = error
-                                isDownloading = false  // Hide loading indicator
-                            },
-                            // refresh Screen
-                            onSuccess = {
-                                errorMessage = "✅ File downloaded successfully!"
-                                url = TextFieldValue()
-                                isDownloading = false
-                            }
-                        )
+                    if (urls.isEmpty() || urls.any { !isValidUrl(it) }) {
+                        errorMessage = "❌ Invalid URL(s)! Please check spelling."
+                        return@clickable
                     }
-                },
+
+                    isDownloading = true
+                    errorMessage = "⏳ Downloading files..."
+
+                    // Launch multiple downloads concurrently
+                    urls.forEach { link ->
+                        coroutineScope.launch {
+                            downloadFile(
+                                context,
+                                link,
+                                onError = { error -> errorMessage = error },
+                                onSuccess = { errorMessage = "✅ All files downloaded!" }
+                            )
+                        }
+                    }
+
+                    url = TextFieldValue() // Clear input field after starting downloads
+                    isDownloading = false
+                }
+            ,
             contentAlignment = Alignment.Center
         ) {
             if (isDownloading) {
