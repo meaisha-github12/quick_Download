@@ -151,7 +151,7 @@ fun DownloaderApp() {
                 )
 
                 .clickable(enabled = !isDownloading) {
-                    val urls = url.text.split("\n", ",").map { it.trim() }.filter { it.isNotEmpty() }
+                    val urls = url.text.split("\n", ",", " ").map { it.trim() }.filter { it.isNotEmpty() }
 
                     if (urls.isEmpty() || urls.any { !isValidUrl(it) }) {
                         errorMessage = "❌ Invalid URL(s)! Please check spelling."
