@@ -119,6 +119,14 @@ fun DownloaderApp() {
                 .background(Color.White, shape = RoundedCornerShape(14.dp))
 
         )
+            Text(
+                text = "💡 Tip: Enter multiple URLs on separate lines.",
+                color = Color.LightGray,
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.inter_extra_light)),
+                textAlign = TextAlign.Start,
+                modifier = Modifier.padding(top = 6.dp)
+            )
 
         // **Show error message if exists**
         errorMessage?.let {
